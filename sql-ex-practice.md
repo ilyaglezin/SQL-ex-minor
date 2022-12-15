@@ -1125,7 +1125,16 @@ GROUP BY maker
 https://sql-ex.ru/learn_exercises.php?LN=87
 
 ```sql
-
+SELECT DISTINCT name, COUNT(town_to) Qty FROM Trip tr JOIN Pass_in_trip pit ON tr.trip_no = pit.trip_no 
+INNER JOIN Passenger psg ON pit.ID_psg = psg.ID_psg
+WHERE town_to = 'Moscow' AND pit.ID_psg NOT IN(SELECT DISTINCT ID_psg 
+FROM Trip tr JOIN Pass_in_trip pit ON tr.trip_no = pit.trip_no
+WHERE date+time_out = (SELECT MIN (date+time_out)
+FROM Trip tr1 JOIN Pass_in_trip pit1 ON tr1.trip_no = pit1.trip_no
+WHERE pit.ID_psg = pit1.ID_psg)
+AND town_from = 'Moscow')
+GROUP BY pit.ID_psg, name
+HAVING COUNT(town_to) > 1
 ```
 
 ## 88
@@ -1133,7 +1142,16 @@ https://sql-ex.ru/learn_exercises.php?LN=87
 https://sql-ex.ru/learn_exercises.php?LN=88
 
 ```sql
-
+SELECT (SELECT name FROM Passenger WHERE ID_psg = B.ID_psg) AS name, B.trip_Qty,
+(SELECT name FROM Company WHERE ID_comp = B.ID_comp) AS Company
+FROM (SELECT P.ID_psg, MIN(T.ID_comp) AS ID_comp, COUNT(*) AS trip_Qty, MAX(COUNT(*)) OVER() AS Max_Qty
+FROM Pass_in_trip AS P 
+INNER JOIN Trip AS T ON P.trip_no = T.trip_no
+GROUP BY P.ID_psg
+HAVING MIN(T.ID_comp) = MAX(T.ID_comp)
+) 
+AS B
+WHERE B.trip_Qty = B.Max_Qty
 ```
 
 ## 89
@@ -1141,7 +1159,15 @@ https://sql-ex.ru/learn_exercises.php?LN=88
 https://sql-ex.ru/learn_exercises.php?LN=89
 
 ```sql
-
+SELECT Maker , count(distinct model) Qty FROM Product
+GROUP BY maker
+HAVING count(distinct model) > = ALL
+(SELECT count(distinct model) FROM Product
+GROUP BY maker)
+or
+count(distinct model) <= ALL
+(SELECT count(distinct model) FROM Product
+GROUP BY maker)
 ```
 
 ## 90
@@ -1149,7 +1175,11 @@ https://sql-ex.ru/learn_exercises.php?LN=89
 https://sql-ex.ru/learn_exercises.php?LN=90
 
 ```sql
-
+SELECT t1.maker, t1.model, t1.type FROM(SELECT
+row_number() over (order by model) p1,
+row_number() over (order by model DESC) p2,
+* FROM product) t1
+WHERE p1 > 3 AND p2 > 3
 ```
 
 ## 91
@@ -1157,7 +1187,12 @@ https://sql-ex.ru/learn_exercises.php?LN=90
 https://sql-ex.ru/learn_exercises.php?LN=91
 
 ```sql
-
+SELECT count(maker) FROM product
+WHERE maker in
+(SELECT maker FROM product
+GROUP BY maker
+HAVING count(model) = 1
+)
 ```
 
 ## 92
@@ -1165,7 +1200,15 @@ https://sql-ex.ru/learn_exercises.php?LN=91
 https://sql-ex.ru/learn_exercises.php?LN=92
 
 ```sql
-
+SELECT Q_NAME FROM utQ
+WHERE Q_ID IN (SELECT DISTINCT B.B_Q_ID
+FROM (SELECT B_Q_ID FROM utB
+GROUP BY B_Q_ID
+HAVING SUM(B_VOL) = 765) AS B
+WHERE B.B_Q_ID NOT IN (SELECT B_Q_ID FROM utB
+WHERE B_V_ID IN (SELECT B_V_ID FROM utB
+GROUP BY B_V_ID
+HAVING SUM(B_VOL) < 255)))
 ```
 
 ## 93
@@ -1189,7 +1232,13 @@ https://sql-ex.ru/learn_exercises.php?LN=94
 https://sql-ex.ru/learn_exercises.php?LN=95
 
 ```sql
-
+SELECT name,
+COUNT(DISTINCT CONVERT(CHAR(24),date)+CONVERT(CHAR(4),Trip.trip_no)),
+COUNT(DISTINCT plane),
+COUNT(DISTINCT ID_psg),
+COUNT(*) FROM Company,Pass_in_trip,Trip
+WHERE Company.ID_comp=Trip.ID_comp and Trip.trip_no=Pass_in_trip.trip_no
+GROUP BY Company.ID_comp,name
 ```
 
 ## 96
@@ -1205,7 +1254,12 @@ https://sql-ex.ru/learn_exercises.php?LN=96
 https://sql-ex.ru/learn_exercises.php?LN=97
 
 ```sql
-
+SELECT code, speed, ram, price, screen FROM laptop WHERE exists (
+SELECT 1 x FROM (SELECT v, rank()over(order by v) rn
+FROM( select cast(speed as float) sp, cast(ram as float) rm,
+CAST(price as float) pr, cast(screen as float) sc)l unpivot(v for c in (sp, rm, pr, sc))u)l pivot(max(v) for rn in ([1],[2],[3],[4]))p
+WHERE [1]*2 <= [2] and [2]*2 <= [3] AND [3]*2 <= [4]
+)
 ```
 
 ## 98
@@ -1221,7 +1275,16 @@ https://sql-ex.ru/learn_exercises.php?LN=98
 https://sql-ex.ru/learn_exercises.php?LN=99
 
 ```sql
-
+SELECT point,"date" income_date,"date" + nvl (min(case when diff > cnt then cnt else null end), max(cnt)+1
+) incass_date
+FROM (SELECT i.point, i."date", (trunc(o."date") - trunc(i."date")) diff,
+count(1) over (partition by i.point, i."date" order by o."date" rows between unbounded preceding and current row)-1 cnt FROM income_o i
+INNER JOIN (select point, "date", 1 disabled FROM outcome_o
+UNION
+SELECT point, trunc("date"+7,'DAY'), 1 disabled FROM income_o) o
+ON i.point = o.point
+WHERE o."date" > = i."date")
+GROUP BY point, "date"
 ```
 
 ## 100
@@ -1229,6 +1292,15 @@ https://sql-ex.ru/learn_exercises.php?LN=99
 https://sql-ex.ru/learn_exercises.php?LN=100
 
 ```sql
-
+SELECT DISTINCT A.date , A.R, B.point, B.inc, C.point, C.out
+FROM (Select distinct date, ROW_Number() OVER(PARTITION BY date ORDER BY code asc) as R FROM Income
+UNION
+SELECT DISTINCT date, ROW_Number() OVER(PARTITION BY date ORDER BY code asc) FROM Outcome) A
+LEFT JOIN (Select date, point, inc, 
+ROW_Number() OVER(PARTITION BY date ORDER BY code asc) as RI FROM Income)
+B ON B.date=A.date and B.RI=A.R
+LEFT JOIN (Select date, point, out,
+ROW_Number() OVER(PARTITION BY date ORDER BY code asc) as RO FROM Outcome)
+C ON C.date=A.date AND C.RO=A.R;
 ```
 
