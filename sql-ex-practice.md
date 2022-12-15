@@ -760,9 +760,10 @@ GROUP BY point) as t2 ON c1=o1
 https://sql-ex.ru/learn_exercises.php?LN=60
 
 ```sql
-select a.point,  case when o is null  then i else i-o end remain FROM (select point, sum(inc) as i 
-from Income_o where '20010415' > date group by point) as A left join (select point, sum(out) as o 
-from Outcome_o  where '20010415' > date group by point) as B on A.point=B.point 
+SELECT a.point,  case WHEN o is null  then i else i-o end remain FROM (SELECT point, sum(inc) as i 
+FROM Income_o WHERE '20010415' > date group by point) as A 
+LEFT JOIN (select point, sum(out) as o 
+FROM Outcome_o  where '20010415' > date group by point) as B on A.point=B.point 
 ```
 
 ## 61
@@ -999,7 +1000,11 @@ WHERE launched is null
 https://sql-ex.ru/learn_exercises.php?LN=77
 
 ```sql
-
+SELECT TOP 1 WITH TIES * FROM (SELECT COUNT (DISTINCT P.trip_no) count, date
+FROM Pass_in_trip P
+INNER JOIN Trip T ON T.trip_no = P.trip_no AND town_from = 'Rostov'
+GROUP BY P.trip_no, date) X
+ORDER BY 1 DESC
 ```
 
 ## 78
@@ -1007,7 +1012,9 @@ https://sql-ex.ru/learn_exercises.php?LN=77
 https://sql-ex.ru/learn_exercises.php?LN=78
 
 ```sql
-
+SELECT name, REPLACE(CONVERT(CHAR(12), DATEADD(m, DATEDIFF(m,0,date),0), 102),'.','-') AS first_day,
+REPLACE(CONVERT(CHAR(12), DATEADD(s,-1,DATEADD(m, DATEDIFF(m,0,date)+1,0)), 102),'.','-') AS last_day
+FROM Battles
 ```
 
 ## 79
@@ -1015,7 +1022,13 @@ https://sql-ex.ru/learn_exercises.php?LN=78
 https://sql-ex.ru/learn_exercises.php?LN=79
 
 ```sql
-
+SELECT Passenger.name, A.minutes FROM (SELECT P.ID_psg,
+SUM((DATEDIFF(minute, time_out, time_in) + 1440)%1440) AS minutes,
+MAX(SUM((DATEDIFF(minute, time_out, time_in) + 1440)%1440)) OVER() AS MaxMinutes FROM Pass_in_trip P JOIN
+Trip AS T ON P.trip_no = T.trip_no
+GROUP BY P.ID_psg) AS A JOIN
+Passenger ON Passenger.ID_psg = A.ID_psg
+WHERE A.minutes = A.MaxMinutes
 ```
 
 ## 80
@@ -1023,7 +1036,10 @@ https://sql-ex.ru/learn_exercises.php?LN=79
 https://sql-ex.ru/learn_exercises.php?LN=80
 
 ```sql
-
+SELECT DISTINCT maker FROM product
+WHERE maker NOT IN (SELECT maker FROM product
+WHERE type='PC' AND model NOT IN (
+SELECT model FROM PC))
 ```
 
 ## 81
