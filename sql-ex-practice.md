@@ -1216,7 +1216,14 @@ HAVING SUM(B_VOL) < 255)))
 https://sql-ex.ru/learn_exercises.php?LN=93
 
 ```sql
-
+SELECT c.name, sum(vr.vr) FROM (SELECT distinct t.id_comp, pt.trip_no, pt.date,t.time_out,t.time_in,--pt.id_psg,
+case
+     WHEN DATEDIFF(mi, t.time_out,t.time_in)> 0 then DATEDIFF(mi, t.time_out,t.time_in)
+     WHEN DATEDIFF(mi, t.time_out,t.time_in)<=0 then DATEDIFF(mi, t.time_out,t.time_in+1)
+end vr
+FROM pass_in_trip pt left join trip t on pt.trip_no=t.trip_no
+) vr left join company c on vr.id_comp=c.id_comp
+GROUP BY c.name;
 ```
 
 ## 94
@@ -1224,7 +1231,23 @@ https://sql-ex.ru/learn_exercises.php?LN=93
 https://sql-ex.ru/learn_exercises.php?LN=94
 
 ```sql
-
+SELECT DATEADD(day, S.Num, D.date) AS Dt,
+(SELECT COUNT(DISTINCT P.trip_no) FROM Pass_in_trip P
+INNER JOIN Trip T
+ON P.trip_no = T.trip_no AND T.town_from = 'Rostov' AND P.date = DATEADD(day, S.Num, D.date)) AS Qty
+FROM (SELECT (3 * ( x - 1 ) + y - 1) AS Num
+FROM (SELECT 1 AS x UNION ALL SELECT 2 UNION ALL SELECT 3) AS N1
+CROSS JOIN (SELECT 1 AS y UNION ALL SELECT 2 UNION ALL SELECT 3) AS N2
+WHERE (3 * ( x - 1 ) + y ) < 8) AS S,
+(SELECT MIN(A.date) AS date
+FROM (SELECT P.date,
+COUNT(DISTINCT P.trip_no) AS Qty,
+MAX(COUNT(DISTINCT P.trip_no)) OVER() AS M_Qty
+FROM Pass_in_trip AS P
+INNER JOIN Trip AS T
+ON P.trip_no = T.trip_no AND T.town_from = 'Rostov'
+GROUP BY P.date) AS A
+WHERE A.Qty = A.M_Qty) AS D
 ```
 
 ## 95
@@ -1246,7 +1269,14 @@ GROUP BY Company.ID_comp,name
 https://sql-ex.ru/learn_exercises.php?LN=96
 
 ```sql
-
+with r as (select v.v_name,
+v.v_id,
+count(case when v_color = 'R' then 1 end) over(partition by v_id) cnt_r,
+count(case when v_color = 'B' then 1 end) over(partition by b_q_id) cnt_b
+FROM utV v join utB b on v.v_id = b.b_v_id)
+SELECT v_name FROM r
+WHERE cnt_r > 1 AND cnt_b > 0
+GROUP BY v_name
 ```
 
 ## 97
@@ -1267,7 +1297,14 @@ WHERE [1]*2 <= [2] and [2]*2 <= [3] AND [3]*2 <= [4]
 https://sql-ex.ru/learn_exercises.php?LN=98
 
 ```sql
-
+with CTE AS
+(SELECT 1 n, cast (0 as varchar(16)) bit_or,
+code, speed, ram FROM PC
+UNION ALL
+SELECT n*2, cast (convert(bit,(speed|ram)&n) as varchar(1))+cast(bit_or as varchar(15)), code, speed, ram
+FROM CTE WHERE n < 65536)
+SELECT code, speed, ram FROM CTE
+WHERE n = 65536 AND CHARINDEX('1111', bit_or )> 0
 ```
 
 ## 99
