@@ -786,7 +786,11 @@ select  (select sum(inc) from income_o where '20010415' > date)   -  (select sum
 https://sql-ex.ru/learn_exercises.php?LN=63
 
 ```sql
-
+SELECT name FROM Passenger
+WHERE ID_psg in
+(SELECT ID_psg FROM Pass_in_trip
+GROUP BY place, ID_psg
+HAVING count(*)>1)
 ```
 
 ## 64
@@ -794,7 +798,13 @@ https://sql-ex.ru/learn_exercises.php?LN=63
 https://sql-ex.ru/learn_exercises.php?LN=64
 
 ```sql
-
+Select income.point, income.date, 'inc' as operation, sum(income.inc) 
+from income left join outcome on income.point=outcome.point and income.date=outcome.date 
+where outcome.date is null  group by income.point, income.date 
+union 
+Select outcome.point, outcome.date, 'out' as operation, sum(outcome.out) 
+from income right join outcome on income.point=outcome.point and income.date=outcome.date 
+where income.date is null group by outcome.point, outcome.date 
 ```
 
 ## 65
@@ -802,7 +812,10 @@ https://sql-ex.ru/learn_exercises.php?LN=64
 https://sql-ex.ru/learn_exercises.php?LN=65
 
 ```sql
-
+Select row_number() over(order by maker, ans) c1, 
+case when maker = lag(maker) over(order by maker) then ''
+else maker end c2, type from (select distinct maker, type, case when type = 'pc' then 1 
+when type = 'Laptop' then 2 when type = 'printer' then 3 end ans from product)t1 
 ```
 
 ## 66
@@ -810,7 +823,26 @@ https://sql-ex.ru/learn_exercises.php?LN=65
 https://sql-ex.ru/learn_exercises.php?LN=66
 
 ```sql
-
+SELECT date, max(c) FROM (SELECT date,count(*) AS c FROM Trip,
+(SELECT trip_no,date FROM Pass_in_trip 
+WHERE date>='2003-04-01' AND date<='2003-04-07' GROUP BY trip_no, date) AS t1
+WHERE Trip.trip_no=t1.trip_no AND town_from='Rostov'
+GROUP BY date
+UNION ALL
+SELECT '2003-04-01',0
+UNION ALL
+SELECT '2003-04-02',0
+UNION ALL
+SELECT '2003-04-03',0
+UNION ALL
+SELECT '2003-04-04',0
+UNION ALL
+SELECT '2003-04-05',0
+UNION ALL
+SELECT '2003-04-06',0
+UNION ALL
+SELECT '2003-04-07',0) AS t2
+GROUP BY date
 ```
 
 ## 67
@@ -818,7 +850,10 @@ https://sql-ex.ru/learn_exercises.php?LN=66
 https://sql-ex.ru/learn_exercises.php?LN=67
 
 ```sql
-
+SELECT count(*) FROM
+(SELECT TOP 1 WITH TIES count(*) c, town_from, town_to FROM trip
+GROUP BY town_from, town_to
+ORDER BY c desc) as t
 ```
 
 ## 68
@@ -826,7 +861,17 @@ https://sql-ex.ru/learn_exercises.php?LN=67
 https://sql-ex.ru/learn_exercises.php?LN=68
 
 ```sql
-
+SELECT count(*) as Count FROM (SELECT TOP 1 WITH TIES sum(c) cc, c1, c2 FROM (
+SELECT count(*) c, town_from c1, town_to c2 FROM trip
+WHERE town_from>=town_to
+GROUP BY town_from, town_to
+UNION ALL
+SELECT count(*) c,town_to, town_from FROM trip
+WHERE town_to>town_from
+GROUP BY town_from, town_to) as t
+GROUP BY c1,c2
+ORDER BY cc DESC
+) as tt
 ```
 
 ## 69
@@ -834,7 +879,18 @@ https://sql-ex.ru/learn_exercises.php?LN=68
 https://sql-ex.ru/learn_exercises.php?LN=69
 
 ```sql
-
+with t as (select point, "date", inc, 0 AS "out" from income
+union all
+select point, "date", 0 AS inc, "out" from outcome
+)
+SELECT t.point, TO_CHAR ( t."date", 'DD/MM/YYYY') AS day,
+(select SUM(i.inc) from t i
+where i."date" <= t."date" and i.point = t.point )
+-
+(select SUM(i."out") from t i
+where i."date" <= t."date" and i.point = t.point ) AS rem
+from t
+group by t.point, t."date"
 ```
 
 ## 70
@@ -842,7 +898,13 @@ https://sql-ex.ru/learn_exercises.php?LN=69
 https://sql-ex.ru/learn_exercises.php?LN=70
 
 ```sql
-
+SELECT DISTINCT o.battle
+FROM outcomes o
+LEFT JOIN ships s ON s.name = o.ship
+LEFT JOIN classes c ON o.ship = c.class OR s.class = c.class
+WHERE c.country IS NOT NULL
+GROUP BY c.country, o.battle
+HAVING COUNT(o.ship) >= 3;
 ```
 
 ## 71
