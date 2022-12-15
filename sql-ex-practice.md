@@ -475,7 +475,7 @@ SELECT c.class FROM Classes c
 LEFT JOIN (Select class, name FROM Ships
 UNION
 SELECT Classes.class as class, Outcomes.ship as name FROM Outcomes
-JOIN Classes ON Outcomes.ship = Classes.class) as s On c.class = s.class
+INNER JOIN Classes ON Outcomes.ship = Classes.class) as s On c.class = s.class
 GROUP BY c.class
 HAVING COUNT(s.name)=1
 ```
@@ -521,17 +521,17 @@ HAVING COUNT(DISTINCT type) = 1 AND COUNT(model) > 1
 https://sql-ex.ru/learn_exercises.php?LN=41
 
 ```sql
-select 'speed' as m, CAST(speed as char) as a from pc where code >= all(select code from pc)  
+SELECT 'speed' as m, CAST(speed as char) as a FROM pc WHERE code >= all(select code from pc)  
 union  
-select 'model' as m, CAST(model as char) as a from pc where code >= all(select code from pc)  
+SELECT 'model' as m, CAST(model as char) as a FROM pc WHERE code >= all(select code from pc)  
 union  
-select 'ram' as m, CAST(ram as char) as a from pc where code >= all(select code from pc)  
+SELECT 'ram' as m, CAST(ram as char) as a FROM pc WHERE code >= all(select code from pc)  
 union  
-select 'hd' as m, CAST(hd as char) as a from pc where code >= all(select code from pc)  
+SELECT 'hd' as m, CAST(hd as char) as a FROM pc WHERE code >= all(select code from pc)  
 union  
-select 'cd' as m, CAST(cd as char) as a from pc where code >= all(select code from pc)  
+SELECT 'cd' as m, CAST(cd as char) as a FROM pc WHERE code >= all(select code from pc)  
 union  
-select 'price' as m, CAST(price as char) as a from pc where code >= all(select code from pc) 
+SELECT 'price' as m, CAST(price as char) as a FROM pc WHERE code >= all(select code from pc) 
 ```
 
 ## 42
@@ -539,8 +539,7 @@ select 'price' as m, CAST(price as char) as a from pc where code >= all(select c
 https://sql-ex.ru/learn_exercises.php?LN=42
 
 ```sql
-SELECT ship, battle
-FROM outcomes
+SELECT ship, battle FROM outcomes
 WHERE result='sunk'
 ```
 
@@ -554,7 +553,7 @@ FROM battles
 WHERE DATEPART(yy, date) NOT IN 
 (SELECT DATEPART(yy, date)
 FROM battles
-JOIN ships ON DATEPART(yy, date)=launched)
+INNER JOIN ships ON DATEPART(yy, date)=launched)
 ```
 
 ## 44
@@ -562,11 +561,11 @@ JOIN ships ON DATEPART(yy, date)=launched)
 https://sql-ex.ru/learn_exercises.php?LN=44
 
 ```sql
-Select name from ships where name like 'R%'   
+SELECT name FROM ships where name like 'R%'   
 union   
-Select name from battles where name like 'R%'   
+SELECT name FROM battles where name like 'R%'   
 union   
-Select ship from outcomes where ship like 'R%'  
+SELECT ship FROM outcomes where ship like 'R%'  
 ```
 
 ## 45
@@ -574,11 +573,11 @@ Select ship from outcomes where ship like 'R%'
 https://sql-ex.ru/learn_exercises.php?LN=45
 
 ```sql
-Select name from ships where name like 'R%'   
+SELECT name FROM ships where name like 'R%'   
 union   
-Select name from battles where name like 'R%'   
+SELECT name FROM battles where name like 'R%'   
 union   
-Select ship from outcomes where ship like 'R%'  
+SELECT ship FROM outcomes where ship like 'R%'  
 ```
 
 ## 46
@@ -619,7 +618,7 @@ https://sql-ex.ru/learn_exercises.php?LN=49
 ```sql
 SELECT s.name 
 FROM ships s 
-JOIN classes c ON s.name=c.class OR s.class = c.class WHERE c.bore = 16
+INNER JOIN classes c ON s.name=c.class OR s.class = c.class WHERE c.bore = 16
 UNION
 SELECT o.ship FROM outcomes o JOIN classes c ON o.ship=c.class WHERE c.bore = 16
 ```
@@ -630,7 +629,7 @@ https://sql-ex.ru/learn_exercises.php?LN=50
 
 ```sql
 SELECT DISTINCT o.battle FROM ships s 
-JOIN outcomes o ON s.name = o.ship 
+INNER JOIN outcomes o ON s.name = o.ship 
 WHERE s.class = 'kongo'
 ```
 
@@ -658,7 +657,9 @@ GROUP BY displacement) as d2 ON d1.displacement=d2.displacement AND d1.numguns =
 https://sql-ex.ru/learn_exercises.php?LN=52
 
 ```sql
-
+SELECT s.name as NAME FROM ships s 
+INNER JOIN classes c ON s.class = c.class WHERE country = 'japan' AND (numGuns >= '9' OR numGuns is null) 
+AND (bore < '19' or bore is null) AND (displacement <= '65000' OR displacement is null) AND type='bb'
 ```
 
 ## 53
@@ -666,7 +667,9 @@ https://sql-ex.ru/learn_exercises.php?LN=52
 https://sql-ex.ru/learn_exercises.php?LN=53
 
 ```sql
-
+SELECT CAST(AVG(numguns*1.0) AS NUMERIC(6,2)) AS Avg_nmg 
+FROM classes 
+WHERE type = 'bb'
 ```
 
 ## 54
@@ -674,7 +677,13 @@ https://sql-ex.ru/learn_exercises.php?LN=53
 https://sql-ex.ru/learn_exercises.php?LN=54
 
 ```sql
-
+SELECT CAST(AVG(numguns*1.0) AS NUMERIC(6,2)) as AVG_nmg FROM (SELECT ship, numguns, type FROM Outcomes 
+JOIN classes ON ship = class
+UNION
+SELECT name, numguns, type 
+FROM ships s 
+JOIN classes c ON c.class = s.class) as x 
+WHERE type = 'bb'
 ```
 
 ## 55
@@ -693,7 +702,11 @@ GROUP BY c.class
 https://sql-ex.ru/learn_exercises.php?LN=56
 
 ```sql
-
+SELECT c.class, COUNT(s.ship) FROM classes c
+LEFT JOIN (SELECT o.ship, sh.class FROM outcomes o
+LEFT JOIN ships sh ON sh.name = o.ship
+WHERE o.result = 'sunk') AS s ON s.class = c.class OR s.ship = c.class
+GROUP BY c.class
 ```
 
 ## 57
@@ -701,7 +714,12 @@ https://sql-ex.ru/learn_exercises.php?LN=56
 https://sql-ex.ru/learn_exercises.php?LN=57
 
 ```sql
-
+SELECT class, COUNT(ship) count_sunked FROM (SELECT name, class FROM ships
+UNION
+SELECT ship, ship FROM outcomes) t
+LEFT JOIN outcomes ON name = ship AND result = 'sunk'
+GROUP BY class
+HAVING COUNT(ship) > 0 AND COUNT(*) > 2;
 ```
 
 ## 58
@@ -709,7 +727,19 @@ https://sql-ex.ru/learn_exercises.php?LN=57
 https://sql-ex.ru/learn_exercises.php?LN=58
 
 ```sql
-
+SELECT m, t,
+CAST(100.0*cc/cc1 AS NUMERIC(5,2)) FROM (SELECT m, t, sum(c) cc from
+(SELECT DISTINCT maker m, 'PC' t, 0 c FROM product
+UNION ALL
+SELECT DISTINCT maker, 'Laptop', 0 FROM product
+UNION ALL
+SELECT DISTINCT maker, 'Printer', 0 FROM product
+UNION ALL
+SELECT maker, type, count(*) FROM product
+GROUP BY maker, type) as tt
+GROUP BY m, t) tt1
+JOIN (SELECT maker, count(*) cc1 FROM product GROUP BY maker
+) tt2
 ```
 
 ## 59
@@ -717,7 +747,12 @@ https://sql-ex.ru/learn_exercises.php?LN=58
 https://sql-ex.ru/learn_exercises.php?LN=59
 
 ```sql
-
+SELECT c1, c2-
+(CASE WHEN o2 is null THEN 0 ELSE o2 END)
+FROM (SELECT point c1, sum(inc) c2 FROM income_o
+GROUP BY point) as t1
+LEFT JOIN (SELECT point o1, sum(out) o2 FROM outcome_o
+GROUP BY point) as t2 ON c1=o1
 ```
 
 ## 60
@@ -725,7 +760,9 @@ https://sql-ex.ru/learn_exercises.php?LN=59
 https://sql-ex.ru/learn_exercises.php?LN=60
 
 ```sql
-
+select a.point,  case when o is null  then i else i-o end remain FROM (select point, sum(inc) as i 
+from Income_o where '20010415' > date group by point) as A left join (select point, sum(out) as o 
+from Outcome_o  where '20010415' > date group by point) as B on A.point=B.point 
 ```
 
 ## 61
@@ -733,7 +770,7 @@ https://sql-ex.ru/learn_exercises.php?LN=60
 https://sql-ex.ru/learn_exercises.php?LN=61
 
 ```sql
-
+select (select sum(inc) from income_o) - (select sum(out) from outcome_o) as remain  
 ```
 
 ## 62
@@ -741,7 +778,7 @@ https://sql-ex.ru/learn_exercises.php?LN=61
 https://sql-ex.ru/learn_exercises.php?LN=62
 
 ```sql
-
+select  (select sum(inc) from income_o where '20010415' > date)   -  (select sum(out) from outcome_o where '20010415' > date)  as remain 
 ```
 
 ## 63
