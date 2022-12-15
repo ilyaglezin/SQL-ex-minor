@@ -919,4 +919,234 @@ GROUP BY p.maker
 HAVING COUNT(p.model) = COUNT(pc.model)
 ```
 
+## 72
+
+https://sql-ex.ru/learn_exercises.php?LN=72
+
+```sql
+
+```
+
+## 73
+
+https://sql-ex.ru/learn_exercises.php?LN=73
+
+```sql
+
+```
+
+## 74
+
+https://sql-ex.ru/learn_exercises.php?LN=74
+
+```sql
+
+```
+
+## 75
+
+https://sql-ex.ru/learn_exercises.php?LN=75
+
+```sql
+
+```
+
+## 76
+
+https://sql-ex.ru/learn_exercises.php?LN=76
+
+```sql
+
+```
+
+## 77
+
+https://sql-ex.ru/learn_exercises.php?LN=77
+
+```sql
+
+```
+
+## 78
+
+https://sql-ex.ru/learn_exercises.php?LN=78
+
+```sql
+
+```
+
+## 79
+
+https://sql-ex.ru/learn_exercises.php?LN=79
+
+```sql
+
+```
+
+## 80
+
+https://sql-ex.ru/learn_exercises.php?LN=80
+
+```sql
+
+```
+
+## 81
+
+https://sql-ex.ru/learn_exercises.php?LN=81
+
+```sql
+
+```
+
+## 82
+
+https://sql-ex.ru/learn_exercises.php?LN=82
+
+```sql
+
+```
+
+## 83
+
+https://sql-ex.ru/learn_exercises.php?LN=83
+
+```sql
+
+```
+## 84
+
+https://sql-ex.ru/learn_exercises.php?LN=84
+
+```sql
+
+```
+
+## 85
+
+https://sql-ex.ru/learn_exercises.php?LN=85
+
+```sql
+
+```
+
+## 86
+
+https://sql-ex.ru/learn_exercises.php?LN=86
+
+```sql
+
+```
+
+## 87
+
+https://sql-ex.ru/learn_exercises.php?LN=87
+
+```sql
+
+```
+
+## 88
+
+https://sql-ex.ru/learn_exercises.php?LN=88
+
+```sql
+
+```
+
+## 89
+
+https://sql-ex.ru/learn_exercises.php?LN=89
+
+```sql
+
+```
+
+## 90
+
+https://sql-ex.ru/learn_exercises.php?LN=90
+
+```sql
+
+```
+
+## 91
+
+https://sql-ex.ru/learn_exercises.php?LN=91
+
+```sql
+
+```
+
+## 92
+
+https://sql-ex.ru/learn_exercises.php?LN=92
+
+```sql
+
+```
+
+## 93
+
+https://sql-ex.ru/learn_exercises.php?LN=93
+
+```sql
+
+```
+
+## 94
+
+https://sql-ex.ru/learn_exercises.php?LN=94
+
+```sql
+
+```
+
+## 95
+
+https://sql-ex.ru/learn_exercises.php?LN=95
+
+```sql
+
+```
+
+## 96
+
+https://sql-ex.ru/learn_exercises.php?LN=96
+
+```sql
+
+```
+
+## 97
+
+https://sql-ex.ru/learn_exercises.php?LN=97
+
+```sql
+
+```
+
+## 98
+
+https://sql-ex.ru/learn_exercises.php?LN=98
+
+```sql
+
+```
+
+## 99
+
+https://sql-ex.ru/learn_exercises.php?LN=99
+
+```sql
+
+```
+
+## 100
+
+https://sql-ex.ru/learn_exercises.php?LN=100
+
+```sql
+
+```
 
