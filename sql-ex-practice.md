@@ -22,6 +22,10 @@
 + [22](#22)
 + [23](#23)
 + [26](#26)
++ [27](#27)
++ [28](#28)
++ [29](#29)
++ [30](#30)
 + [31](#31)
 + [33](#33)
 + [34](#34)
@@ -259,6 +263,39 @@ SELECT maker as Maker, MAX(price) as Max_price FROM product
 JOIN pc on product.model = pc.model
 GROUP BY maker
 ```
+## 24
+
+https://sql-ex.ru/learn_exercises.php?LN=24
+
+```sql
+SELECT model FROM (SELECT model, price FROM pc
+UNION
+SELECT model, price FROM laptop
+UNION
+SELECT model, price FROM printer) table1
+WHERE price = (SELECT MAX(price) 
+FROM (SELECT price FROM pc
+UNION
+SELECT price FROM laptop
+UNION
+SELECT price FROM Printer) table2
+)
+```
+
+## 25
+
+https://sql-ex.ru/learn_exercises.php?LN=25
+
+```sql
+SELECT DISTINCT maker FROM product
+WHERE model IN (SELECT model FROM pc
+WHERE ram = (SELECT MIN(ram)FROM pc)
+AND speed = (SELECT MAX(speed) FROM pc 
+WHERE ram = (SELECT MIN(ram) FROM pc)
+  )
+)
+AND maker IN (SELECT maker FROM product WHERE type='printer')
+```
 
 ## 26
 
@@ -270,6 +307,41 @@ UNION ALL
 SELECT model, price FROM Laptop) AS price
 INNER JOIN product ON price.model = product.model
 WHERE maker = 'A'
+```
+
+## 27
+
+https://sql-ex.ru/learn_exercises.php?LN=27
+
+```sql
+SELECT maker as Maker, AVG(hd) as AVG
+FROM product JOIN pc ON product.model=pc.model
+WHERE maker IN (SELECT maker FROM product WHERE type='printer')
+GROUP BY maker
+```
+
+## 28
+
+https://sql-ex.ru/learn_exercises.php?LN=28
+
+```sql
+
+```
+
+## 29
+
+https://sql-ex.ru/learn_exercises.php?LN=29
+
+```sql
+
+```
+
+## 30
+
+https://sql-ex.ru/learn_exercises.php?LN=30
+
+```sql
+
 ```
 
 ## 31
