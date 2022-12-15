@@ -386,7 +386,8 @@ GROUP BY maker
 https://sql-ex.ru/learn_exercises.php?LN=28
 
 ```sql
-
+SELECT COUNT(maker) as Quantity FROM 
+(SELECT maker FROM product GROUP BY maker HAVING COUNT(*) = 1) this_table
 ```
 
 ## 29
@@ -394,7 +395,12 @@ https://sql-ex.ru/learn_exercises.php?LN=28
 https://sql-ex.ru/learn_exercises.php?LN=29
 
 ```sql
-
+SELECT income_o.point, income_o.[date], inc, out FROM income_o 
+LEFT JOIN outcome_o ON outcome_o.point = income_o.point
+AND outcome_o.[date]=income_o.[date]
+UNION
+SELECT outcome_o.point, outcome_o.[date], inc, out FROM income_o 
+RIGHT JOIN outcome_o ON outcome_o.point = income_o.point AND outcome_o.[date] = income_o.[date]
 ```
 
 ## 30
@@ -402,7 +408,11 @@ https://sql-ex.ru/learn_exercises.php?LN=29
 https://sql-ex.ru/learn_exercises.php?LN=30
 
 ```sql
-
+SELECT point, [date], SUM(outs), SUM(incs) FROM
+(SELECT point, [date], SUM(out) outs, null incs FROM outcome GROUP BY point, [date]
+UNION
+SELECT point, [date], null, SUM(inc) incs FROM income 
+GROUP BY point, [date]) this_table GROUP BY point, [date]
 ```
 
 ## 31
@@ -439,7 +449,10 @@ WHERE launched >=1922 AND displacement>35000 AND type='bb' AND ships.class = cla
 https://sql-ex.ru/learn_exercises.php?LN=35
 
 ```sql
-......
+SELECT model, type
+FROM product
+WHERE upper(model) NOT like '%[^A-Z]%'
+OR model not like '%[^0-9]%'
 ```
 
 ## 36
@@ -447,7 +460,10 @@ https://sql-ex.ru/learn_exercises.php?LN=35
 https://sql-ex.ru/learn_exercises.php?LN=36
 
 ```sql
-
+SELECT DISTINCT name as Name FROM (SELECT name FROM ships
+UNION
+SELECT ship FROM outcomes) t1
+WHERE name IN (SELECT class FROM classes)
 ```
 
 ## 37
