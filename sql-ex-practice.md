@@ -1047,7 +1047,11 @@ SELECT model FROM PC))
 https://sql-ex.ru/learn_exercises.php?LN=81
 
 ```sql
-
+SELECT O.* FROM outcome O
+INNER JOIN (SELECT TOP 1 WITH TIES YEAR(date) AS Y, MONTH(date) AS M, SUM(out) AS ALL_TOTAL
+FROM outcome
+GROUP BY YEAR(date), MONTH(date)
+ORDER BY ALL_TOTAL DESC) R ON YEAR(O.date) = R.Y AND MONTH(O.date) = R.M
 ```
 
 ## 82
@@ -1055,7 +1059,12 @@ https://sql-ex.ru/learn_exercises.php?LN=81
 https://sql-ex.ru/learn_exercises.php?LN=82
 
 ```sql
-
+WITH CTE(code,price,number) AS
+(SELECT PC.code,PC.price, number= ROW_NUMBER() OVER (ORDER BY PC.code) FROM PC)
+SELECT CTE.code, AVG(C.price) FROM CTE
+INNER JOIN CTE C ON (C.number-CTE.number)<6 AND (C.number-CTE.number)> =0
+GROUP BY CTE.number,CTE.code
+HAVING COUNT(CTE.number)=6
 ```
 
 ## 83
@@ -1063,14 +1072,29 @@ https://sql-ex.ru/learn_exercises.php?LN=82
 https://sql-ex.ru/learn_exercises.php?LN=83
 
 ```sql
-
+SELECT name as NAME
+FROM Ships AS s JOIN Classes AS cl1 ON s.class = cl1.class
+WHERE
+CASE WHEN numGuns = 8 THEN 1 ELSE 0 END +
+CASE WHEN bore = 15 THEN 1 ELSE 0 END +
+CASE WHEN displacement = 32000 THEN 1 ELSE 0 END +
+CASE WHEN type = 'bb' THEN 1 ELSE 0 END +
+CASE WHEN launched = 1915 THEN 1 ELSE 0 END +
+CASE WHEN s.class = 'Kongo' THEN 1 ELSE 0 END +
+CASE WHEN country = 'USA' THEN 1 ELSE 0 END > = 4;
 ```
 ## 84
 
 https://sql-ex.ru/learn_exercises.php?LN=84
 
 ```sql
-
+SELECT C.name, A.N_1_10, A.N_11_21, A.N_21_30 FROM (SELECT T.ID_comp,
+SUM(CASE WHEN DAY(P.date) < 11 THEN 1 ELSE 0 END) AS N_1_10,
+SUM(CASE WHEN (DAY(P.date) > 10 AND DAY(P.date) < 21) THEN 1 ELSE 0 END) AS N_11_21,
+SUM(CASE WHEN DAY(P.date) > 20 THEN 1 ELSE 0 END) AS N_21_30 FROM Trip AS T 
+INNER JOIN Pass_in_trip AS P ON T.trip_no = P.trip_no AND CONVERT(char(6), P.date, 112) = '200304'
+GROUP BY T.ID_comp) AS A JOIN
+Company AS C ON A.ID_comp = C.ID_comp
 ```
 
 ## 85
@@ -1078,7 +1102,11 @@ https://sql-ex.ru/learn_exercises.php?LN=84
 https://sql-ex.ru/learn_exercises.php?LN=85
 
 ```sql
-
+SELECT maker FROM product
+GROUP BY maker
+HAVING count(distinct type) = 1 AND
+(min(type) = 'printer' OR
+(min(type) = 'pc' AND count(model) >= 3))
 ```
 
 ## 86
@@ -1086,7 +1114,10 @@ https://sql-ex.ru/learn_exercises.php?LN=85
 https://sql-ex.ru/learn_exercises.php?LN=86
 
 ```sql
-
+SELECT maker, CASE count(distinct type) WHEN 2 then MIN(type) + '/' + MAX(type)
+WHEN 1 then MAX(type)
+WHEN 3 then 'Laptop/PC/Printer' END FROM Product
+GROUP BY maker
 ```
 
 ## 87
