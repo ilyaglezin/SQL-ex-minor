@@ -879,18 +879,17 @@ ORDER BY cc DESC
 https://sql-ex.ru/learn_exercises.php?LN=69
 
 ```sql
-with t as (select point, "date", inc, 0 AS "out" from income
-union all
-select point, "date", 0 AS inc, "out" from outcome
+with t as (select point, "date", inc, 0 AS "out" FROM income
+UNION ALL
+SELECT point, "date", 0 AS inc, "out" FROM outcome
 )
 SELECT t.point, TO_CHAR ( t."date", 'DD/MM/YYYY') AS day,
-(select SUM(i.inc) from t i
-where i."date" <= t."date" and i.point = t.point )
+(SELECT SUM(i.inc) FROM t i
+WHERE i."date" <= t."date" and i.point = t.point )
 -
-(select SUM(i."out") from t i
-where i."date" <= t."date" and i.point = t.point ) AS rem
-from t
-group by t.point, t."date"
+(select SUM(i."out") FROM t i
+WHERE i."date" <= t."date" and i.point = t.point ) AS rem FROM t
+GROUP BY t.point, t."date"
 ```
 
 ## 70
@@ -924,7 +923,12 @@ HAVING COUNT(p.model) = COUNT(pc.model)
 https://sql-ex.ru/learn_exercises.php?LN=72
 
 ```sql
-
+SELECT p.maker
+FROM product p
+LEFT JOIN pc ON pc.model = p.model
+WHERE p.type = 'PC'
+GROUP BY p.maker
+HAVING COUNT(p.model) = COUNT(pc.model)
 ```
 
 ## 73
@@ -932,7 +936,13 @@ https://sql-ex.ru/learn_exercises.php?LN=72
 https://sql-ex.ru/learn_exercises.php?LN=73
 
 ```sql
-
+SELECT DISTINCT c.country, b.name FROM battles b, classes c MINUS
+SELECT c.country, o.battle
+FROM outcomes o
+LEFT JOIN ships s ON s.name = o.ship
+LEFT JOIN classes c ON o.ship = c.class OR s.class = c.class
+WHERE c.country IS NOT NULL
+GROUP BY c.country, o.battle
 ```
 
 ## 74
@@ -940,7 +950,14 @@ https://sql-ex.ru/learn_exercises.php?LN=73
 https://sql-ex.ru/learn_exercises.php?LN=74
 
 ```sql
-
+SELECT c.country, c.class FROM classes c
+WHERE UPPER(c.country) = 'RUSSIA' AND EXISTS (
+SELECT c.country, c.class FROM classes c
+WHERE UPPER(c.country) = 'RUSSIA')
+UNION ALL
+SELECT c.country, c.class FROM classes c
+WHERE NOT EXISTS (SELECT c.country, c.class FROM classes c
+WHERE UPPER(c.country) = 'RUSSIA')
 ```
 
 ## 75
@@ -948,7 +965,17 @@ https://sql-ex.ru/learn_exercises.php?LN=74
 https://sql-ex.ru/learn_exercises.php?LN=75
 
 ```sql
-
+SELECT shipname,launched,batname FROM (SELECT s.name as shipname, launched, b.name as batname,
+row_number() over (partition by s.name order by "date") as num
+FROM ships s,battles b
+WHERE to_char("date",'yyyy')>=launched
+AND launched is not null)
+WHERE num = 1
+UNION
+(SELECT name,launched,(SELECT name FROM battles
+WHERE "date" = (SELECT MAX("date") FROM battles)) as batname FROM ships
+WHERE launched is null
+)
 ```
 
 ## 76
@@ -956,7 +983,15 @@ https://sql-ex.ru/learn_exercises.php?LN=75
 https://sql-ex.ru/learn_exercises.php?LN=76
 
 ```sql
-
+SELECT shipname,launched,batname FROM (SELECT s.name as shipname, launched, b.name as batname,
+row_number() over (partition by s.name order by "date") as num FROM ships s, battles b
+WHERE to_char("date",'yyyy')>=launched and launched is not null)
+WHERE num = 1
+union
+(SELECT name,launched,(select name FROM battles
+WHERE "date" = (select max("date") FROM battles)) as batname FROM ships
+WHERE launched is null
+)
 ```
 
 ## 77
