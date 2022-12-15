@@ -471,7 +471,13 @@ WHERE name IN (SELECT class FROM classes)
 https://sql-ex.ru/learn_exercises.php?LN=37
 
 ```sql
-
+SELECT c.class FROM Classes c
+LEFT JOIN (Select class, name FROM Ships
+UNION
+SELECT Classes.class as class, Outcomes.ship as name FROM Outcomes
+JOIN Classes ON Outcomes.ship = Classes.class) as s On c.class = s.class
+GROUP BY c.class
+HAVING COUNT(s.name)=1
 ```
 
 ## 38
@@ -479,7 +485,11 @@ https://sql-ex.ru/learn_exercises.php?LN=37
 https://sql-ex.ru/learn_exercises.php?LN=38
 
 ```sql
-
+SELECT DISTINCT country as COUNTRY FROM classes
+WHERE type='bb' AND country IN
+(SELECT country FROM classes
+WHERE type = 'bc'
+)
 ```
 
 ## 39
@@ -487,7 +497,12 @@ https://sql-ex.ru/learn_exercises.php?LN=38
 https://sql-ex.ru/learn_exercises.php?LN=39
 
 ```sql
-
+SELECT DISTINCT ship FROM outcomes o1
+LEFT JOIN Battles b1 ON b1.name = o1.battle
+WHERE result = 'damaged'
+and ship IN(SELECT ship FROM outcomes o2
+LEFT JOIN Battles b2 ON b2.name = o2.battle
+WHERE o2.ship=o1.ship AND b2.date > b1.date)
 ```
 
 ## 40
@@ -506,7 +521,17 @@ HAVING COUNT(DISTINCT type) = 1 AND COUNT(model) > 1
 https://sql-ex.ru/learn_exercises.php?LN=41
 
 ```sql
-
+select 'speed' as m, CAST(speed as char) as a from pc where code >= all(select code from pc)  
+union  
+select 'model' as m, CAST(model as char) as a from pc where code >= all(select code from pc)  
+union  
+select 'ram' as m, CAST(ram as char) as a from pc where code >= all(select code from pc)  
+union  
+select 'hd' as m, CAST(hd as char) as a from pc where code >= all(select code from pc)  
+union  
+select 'cd' as m, CAST(cd as char) as a from pc where code >= all(select code from pc)  
+union  
+select 'price' as m, CAST(price as char) as a from pc where code >= all(select code from pc) 
 ```
 
 ## 42
@@ -524,7 +549,12 @@ WHERE result='sunk'
 https://sql-ex.ru/learn_exercises.php?LN=43
 
 ```sql
-
+SELECT name 
+FROM battles 
+WHERE DATEPART(yy, date) NOT IN 
+(SELECT DATEPART(yy, date)
+FROM battles
+JOIN ships ON DATEPART(yy, date)=launched)
 ```
 
 ## 44
@@ -532,7 +562,11 @@ https://sql-ex.ru/learn_exercises.php?LN=43
 https://sql-ex.ru/learn_exercises.php?LN=44
 
 ```sql
-
+Select name from ships where name like 'R%'   
+union   
+Select name from battles where name like 'R%'   
+union   
+Select ship from outcomes where ship like 'R%'  
 ```
 
 ## 45
@@ -540,7 +574,11 @@ https://sql-ex.ru/learn_exercises.php?LN=44
 https://sql-ex.ru/learn_exercises.php?LN=45
 
 ```sql
-
+Select name from ships where name like 'R%'   
+union   
+Select name from battles where name like 'R%'   
+union   
+Select ship from outcomes where ship like 'R%'  
 ```
 
 ## 46
@@ -567,15 +605,23 @@ https://sql-ex.ru/learn_exercises.php?LN=47
 https://sql-ex.ru/learn_exercises.php?LN=48
 
 ```sql
-
+SELECT class
+FROM classes t1 LEFT JOIN outcomes t2 ON t1.class=t2.ship WHERE result='sunk'
+UNION
+SELECT class
+FROM ships LEFT JOIN outcomes ON ships.name=outcomes.ship WHERE result='sunk'
 ```
 
-## 48
+## 49
 
-https://sql-ex.ru/learn_exercises.php?LN=48
+https://sql-ex.ru/learn_exercises.php?LN=49
 
 ```sql
-
+SELECT s.name 
+FROM ships s 
+JOIN classes c ON s.name=c.class OR s.class = c.class WHERE c.bore = 16
+UNION
+SELECT o.ship FROM outcomes o JOIN classes c ON o.ship=c.class WHERE c.bore = 16
 ```
 
 ## 50
@@ -593,7 +639,18 @@ WHERE s.class = 'kongo'
 https://sql-ex.ru/learn_exercises.php?LN=51
 
 ```sql
-
+SELECT NAME 
+FROM (SELECT name as NAME, displacement, numguns FROM ships 
+INNER JOIN classes ON ships.class = classes.class 
+UNION 
+SELECT ship as NAME, displacement, numguns FROM outcomes 
+INNER JOIN classes ON outcomes.ship= classes.class) as d1 
+INNER JOIN (SELECT displacement, max(numGuns) as numguns FROM (SELECT displacement, numguns FROM ships 
+INNER JOIN classes ON ships.class = classes.class 
+UNION 
+SELECT displacement, numguns FROM outcomes 
+INNER JOIN classes ON outcomes.ship= classes.class) as f 
+GROUP BY displacement) as d2 ON d1.displacement=d2.displacement AND d1.numguns =d2.numguns
 ```
 
 ## 52
