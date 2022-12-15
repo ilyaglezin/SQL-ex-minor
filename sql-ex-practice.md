@@ -442,6 +442,38 @@ https://sql-ex.ru/learn_exercises.php?LN=35
 ......
 ```
 
+## 36
+
+https://sql-ex.ru/learn_exercises.php?LN=36
+
+```sql
+
+```
+
+## 37
+
+https://sql-ex.ru/learn_exercises.php?LN=37
+
+```sql
+
+```
+
+## 38
+
+https://sql-ex.ru/learn_exercises.php?LN=38
+
+```sql
+
+```
+
+## 39
+
+https://sql-ex.ru/learn_exercises.php?LN=39
+
+```sql
+
+```
+
 ## 40
 
 https://sql-ex.ru/learn_exercises.php?LN=40
@@ -453,6 +485,14 @@ GROUP BY maker
 HAVING COUNT(DISTINCT type) = 1 AND COUNT(model) > 1
 ```
 
+## 41
+
+https://sql-ex.ru/learn_exercises.php?LN=41
+
+```sql
+
+```
+
 ## 42
 
 https://sql-ex.ru/learn_exercises.php?LN=42
@@ -461,6 +501,30 @@ https://sql-ex.ru/learn_exercises.php?LN=42
 SELECT ship, battle
 FROM outcomes
 WHERE result='sunk'
+```
+
+## 43
+
+https://sql-ex.ru/learn_exercises.php?LN=43
+
+```sql
+
+```
+
+## 44
+
+https://sql-ex.ru/learn_exercises.php?LN=44
+
+```sql
+
+```
+
+## 45
+
+https://sql-ex.ru/learn_exercises.php?LN=45
+
+```sql
+
 ```
 
 ## 46
@@ -474,6 +538,30 @@ RIGHT JOIN outcomes ON classes.class=ship OR ships.name=ship
 WHERE battle='Guadalcanal'
 ```
 
+## 47
+
+https://sql-ex.ru/learn_exercises.php?LN=47
+
+```sql
+
+```
+
+## 48
+
+https://sql-ex.ru/learn_exercises.php?LN=48
+
+```sql
+
+```
+
+## 48
+
+https://sql-ex.ru/learn_exercises.php?LN=48
+
+```sql
+
+```
+
 ## 50
 
 https://sql-ex.ru/learn_exercises.php?LN=50
@@ -482,6 +570,38 @@ https://sql-ex.ru/learn_exercises.php?LN=50
 SELECT DISTINCT o.battle FROM ships s 
 JOIN outcomes o ON s.name = o.ship 
 WHERE s.class = 'kongo'
+```
+
+## 51
+
+https://sql-ex.ru/learn_exercises.php?LN=51
+
+```sql
+
+```
+
+## 52
+
+https://sql-ex.ru/learn_exercises.php?LN=52
+
+```sql
+
+```
+
+## 53
+
+https://sql-ex.ru/learn_exercises.php?LN=53
+
+```sql
+
+```
+
+## 54
+
+https://sql-ex.ru/learn_exercises.php?LN=54
+
+```sql
+
 ```
 
 ## 55
@@ -493,6 +613,126 @@ SELECT c.class, min(s.launched)
 FROM classes c 
 LEFT JOIN ships s ON c.class = s.class 
 GROUP BY c.class
+```
+
+## 56
+
+https://sql-ex.ru/learn_exercises.php?LN=56
+
+```sql
+
+```
+
+## 57
+
+https://sql-ex.ru/learn_exercises.php?LN=57
+
+```sql
+
+```
+
+## 58
+
+https://sql-ex.ru/learn_exercises.php?LN=58
+
+```sql
+
+```
+
+## 59
+
+https://sql-ex.ru/learn_exercises.php?LN=59
+
+```sql
+
+```
+
+## 60
+
+https://sql-ex.ru/learn_exercises.php?LN=60
+
+```sql
+
+```
+
+## 61
+
+https://sql-ex.ru/learn_exercises.php?LN=61
+
+```sql
+
+```
+
+## 62
+
+https://sql-ex.ru/learn_exercises.php?LN=62
+
+```sql
+
+```
+
+## 63
+
+https://sql-ex.ru/learn_exercises.php?LN=63
+
+```sql
+
+```
+
+## 64
+
+https://sql-ex.ru/learn_exercises.php?LN=64
+
+```sql
+
+```
+
+## 65
+
+https://sql-ex.ru/learn_exercises.php?LN=65
+
+```sql
+
+```
+
+## 66
+
+https://sql-ex.ru/learn_exercises.php?LN=66
+
+```sql
+
+```
+
+## 67
+
+https://sql-ex.ru/learn_exercises.php?LN=67
+
+```sql
+
+```
+
+## 68
+
+https://sql-ex.ru/learn_exercises.php?LN=68
+
+```sql
+
+```
+
+## 69
+
+https://sql-ex.ru/learn_exercises.php?LN=69
+
+```sql
+
+```
+
+## 70
+
+https://sql-ex.ru/learn_exercises.php?LN=70
+
+```sql
+
 ```
 
 ## 71
